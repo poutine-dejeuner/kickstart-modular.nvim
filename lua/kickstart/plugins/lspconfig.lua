@@ -124,7 +124,7 @@ return {
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -188,6 +188,13 @@ return {
         vim.lsp.config(name, server)
         vim.lsp.enable(name)
       end
+
+      -- ltex-ls requires Java and is not managed by Mason; configure manually if installed
+      vim.lsp.config('ltex', {
+        capabilities = { general = { positionEncodings = { 'utf-16' } } },
+        settings = { ltex = { language = 'fr' } },
+      })
+      vim.lsp.enable 'ltex'
     end,
   },
 }
