@@ -11,6 +11,7 @@ vim.keymap.set('i', 'jk', '<Esc>')
 vim.keymap.set('n', '<C-t>', function()
   require('toggle-bool').toggle_bool()
 end, { noremap = true, silent = true })
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to [G]o [D]efinition' })
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
