@@ -13,6 +13,11 @@ vim.keymap.set('n', '<C-t>', function()
 end, { noremap = true, silent = true })
 vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to [G]o [D]efinition' })
 
+-- [[ visual line navigation ]]
+-- These keymaps will navigate visual lines when the cursor is on a wrapped line
+vim.keymap.set('n', 'j', 'v:count == 0 ? "gj" : "j"', { expr = true, silent = true })
+vim.keymap.set('n', 'k', 'v:count == 0 ? "gk" : "k"', { expr = true, silent = true })
+
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
@@ -82,5 +87,34 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.keymap.set('n', '<leader>n', ':bn<cr>')
 vim.keymap.set('n', '<leader>p', ':bp<cr>')
 vim.keymap.set('n', '<leader>x', ':bd<cr>')
+
+vim.keymap.set('v', '<leader>c', function()
+  -- 1. Demander à l'utilisateur de saisir le caractère <C>
+  local char = vim.fn.input('Caractère de séparation : ')
+  
+  -- Si l'utilisateur n'a rien saisi ou a fait Échap, on annule
+  if char == "" then return end
+
+  -- 2. Sauvegarder le contenu et le type du registre sans-nom
+  local old_reg = vim.fn.getreg('"')
+  local old_regtype = vim.fn.getregtype('"')
+
+  -- 3. Couper la sélection visuelle (sélection automatique du registre '"')
+  -- 'gv' re-sélectionne le bloc, 'd' le coupe
+  vim.cmd('normal! d')
+
+  -- 4. Récupérer le texte qui vient d'être coupé
+  local selection = vim.fn.getreg('"')
+
+  -- 5. Construire la nouvelle chaîne : <C><sélection><C>
+  local new_text = char .. selection .. char
+
+  -- 6. Placer le nouveau texte dans le registre et le coller
+  vim.fn.setreg('"', new_text, 'v')
+  vim.cmd('normal! p')
+
+  -- 7. Restaurer l'ancien registre pour ne pas polluer l'historique de yank
+  vim.fn.setreg('"', old_reg, old_regtype)
+end, { silent = true, desc = "Envelopper la sélection entre deux caractères identiques" })
 
 -- vim: ts=2 sts=2 sw=2 et
